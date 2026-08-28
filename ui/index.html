@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#eaf5fb" />
+    <title>STATEWAKE — Re-entry prototype</title>
+    <link rel="stylesheet" href="/static/styles.css?v=coherence-v2-mobile-final5" />
+  </head>
+  <body>
+    <div class="ambient ambient-left" aria-hidden="true"></div>
+    <div class="ambient ambient-right" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="wordmark" href="#return" aria-label="STATEWAKE home">
+        <span class="wordmark-mark" aria-hidden="true"></span>
+        <span>STATEWAKE</span>
+      </a>
+      <div class="header-meta">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="mode-label">re-entry / API mode</span>
+      </div>
+    </header>
+
+    <nav class="state-nav" aria-label="Prototype states">
+      <button class="state-tab is-active" data-state="return">01 Return</button>
+      <button class="state-tab" data-state="recover">02 Recover</button>
+      <button class="state-tab" data-state="resume">03 Resume</button>
+      <button class="state-tab" data-state="valid">04 Still aligned</button>
+    </nav>
+
+    <main id="app" class="app-shell" aria-live="polite"></main>
+
+    <footer class="site-footer">
+      <span>Trusted State first.</span>
+      <span class="footer-rule" aria-hidden="true"></span>
+      <span>Evidence is read, not obeyed.</span>
+    </footer>
+
+    <script src="/static/app.js?v=3d" defer></script>
+  </body>
+</html>

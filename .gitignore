@@ -1,0 +1,30 @@
+.env
+.env.*
+!.env.example
+
+.venv/
+venv/
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+.DS_Store
+Thumbs.db
+*.log
+
+service-account*.json
+credentials*.json
+application_default_credentials.json
+
+# Local visual exports and generated review artifacts
+.coherence-*/
+.return-illustration-shots*/
+.return-state-card-shots/
+screenshots-*/
+
+# Local exploratory spikes and retry experiments
+spike*.py
+retry_s05.py
+smoke_gemini.py
