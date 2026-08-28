@@ -26,5 +26,6 @@ screenshots-*/
 
 # Local exploratory spikes and retry experiments
 spike*.py
+spike*.json
 retry_s05.py
 smoke_gemini.py
