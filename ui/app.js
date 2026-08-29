@@ -38,12 +38,19 @@ const explicitApiBase = new URLSearchParams(window.location.search).get("api");
 const apiBase = window.STATEWAKE_API_BASE || explicitApiBase || "";
 let latestApiResponse = null;
 let memoryCaptureState = "available";
+let currentTrustedState = null;
+let projectStateError = null;
 
 document.querySelector("#mode-label").textContent = fixtureMode
   ? "re-entry / fixture fallback"
   : "re-entry / API mode";
 
 function returnStateCards() {
+  const trusted = currentTrustedState || latestApiResponse?.trusted_state || {
+    checkpoint_id: "CP-01",
+    direction: "Feature A",
+    current_next_action: "Finish Feature A integration",
+  };
   return `<div class="return-state-visual" aria-label="Project state comparison">
     <article class="state-card return-state-card return-state-card-current">
       <p class="card-kicker">Current project</p>
@@ -55,10 +62,10 @@ function returnStateCards() {
         <p class="card-kicker">Last trusted state</p>
         <span class="return-state-trust"><i></i>Trusted</span>
       </div>
-      <p class="return-state-checkpoint">CP-01</p>
+      <p class="return-state-checkpoint">${escapeHtml(trusted.checkpoint_id || "CP-01")}</p>
       <dl>
-        <div><dt>Direction</dt><dd>Feature A</dd></div>
-        <div><dt>Next action</dt><dd>Finish Feature A integration</dd></div>
+        <div><dt>Direction</dt><dd>${escapeHtml(trusted.direction || "")}</dd></div>
+        <div><dt>Next action</dt><dd>${escapeHtml(trusted.current_next_action || "")}</dd></div>
       </dl>
     </article>
   </div>`;
@@ -66,6 +73,10 @@ function returnStateCards() {
 
 function button(label, state, className = "button") {
   return `<button class="${className}" data-state="${state}">${label}</button>`;
+}
+
+function actionButton(label, action, className = "button") {
+  return `<button class="${className}" data-action="${action}">${label}</button>`;
 }
 
 function returnScreen(data) {
@@ -164,7 +175,8 @@ function resumeScreen(data) {
       <p class="eyebrow">${data.eyebrow}</p>
       <h1>${data.title}</h1>
       <p class="lede">${data.lede}</p>
-      <div class="actions">${button("Resume Project", "resume")}</div>
+      <div class="actions">${actionButton("Resume Project", "resume-project")}</div>
+      ${projectStateError ? `<p class="helper api-error">${escapeHtml(projectStateError)}</p>` : ""}
       <div class="state-card glass resume-artifact">
       <div class="artifact-heading">
         <div><p class="card-kicker">Resume State</p><p class="artifact-title">A verified point of continuation</p></div>
@@ -207,7 +219,7 @@ function validScreen(data) {
       <p class="lede">${data.lede}</p>
       <p class="validation-complete">Validation complete. <span>No recovery required.</span></p>
       <p class="quiet-line">${data.supporting}</p>
-      <div class="actions">${button("Resume Project", "resume")}</div>
+      <div class="actions">${actionButton("Resume Project", "resume-project")}</div>
       <div class="state-card glass valid-artifact">
       <p class="card-kicker">Still aligned</p>
       <p class="valid-checkpoint">${escapeHtml(state.checkpoint_id)}</p>
@@ -240,6 +252,8 @@ function render(state = "return") {
   });
   const reenter = document.querySelector('[data-action="reenter"]');
   if (reenter && !fixtureMode) reenter.addEventListener("click", requestReentry);
+  const resumeProject = document.querySelector('[data-action="resume-project"]');
+  if (resumeProject) resumeProject.addEventListener("click", requestResumeProject);
   const resolution = document.querySelector('[data-action="resolution"]');
   if (resolution && !fixtureMode) resolution.addEventListener("click", requestResolution);
   const defer = document.querySelector('[data-action="defer"]');
@@ -311,6 +325,31 @@ async function requestReentry() {
     control.disabled = false;
     control.textContent = "Re-enter Project";
     control.insertAdjacentHTML("afterend", `<p class="helper api-error">${escapeHtml(error.message)}</p>`);
+  }
+}
+
+async function requestResumeProject() {
+  if (fixtureMode) {
+    window.location.hash = "return";
+    return;
+  }
+  const control = document.querySelector('[data-action="resume-project"]');
+  control.disabled = true;
+  control.textContent = "Loading trusted state…";
+  projectStateError = null;
+  try {
+    const response = await fetch(`${apiBase}/api/project`);
+    if (!response.ok) throw new Error(`Trusted state request failed (${response.status})`);
+    const payload = await response.json();
+    if (!payload.project_state || typeof payload.project_state !== "object") {
+      throw new Error("Trusted state response was malformed");
+    }
+    currentTrustedState = payload.project_state;
+    latestApiResponse = { ...(latestApiResponse || {}), trusted_state: currentTrustedState };
+    window.location.hash = "return";
+  } catch (error) {
+    projectStateError = error.message;
+    render("resume");
   }
 }
 
