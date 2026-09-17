@@ -11,13 +11,19 @@ project state you trusted when you left is still safe to continue from.
 > The problem isn't forgetting. It's continuing from something that stopped
 > being true.
 
+## Project status
+
+STATEWAKE is a **completed 2026 hackathon submission and deployed project snapshot**.
+
+The core product logic is frozen around **Validate before Recover**. The repository is not currently in an active feature-expansion phase; future work should be treated as post-hackathon continuation rather than unfinished submission work.
+
 ## Live demo
 
 - [STATEWAKE](https://statewake-73198201224.us-central1.run.app)
 - [Demo Evidence Repository](https://github.com/cyrilla-mist/statewake-demo-project)
 
 `statewake-demo-project` is not the STATEWAKE source repository. It is a
-small public project used as live external project evidence during the demo.
+small public project used as external project evidence during the demo.
 
 ## What STATEWAKE does
 
@@ -65,6 +71,8 @@ The evidence cursor advances with the committed state, so later re-entry starts
 from the current trusted observation boundary rather than replaying the Hero
 baseline.
 
+> The CP-02 text above is part of the controlled demo scenario. “Resolve Cloud Run deployment failure” describes the project state being recovered inside that scenario; it is not a statement that the STATEWAKE public deployment is currently down.
+
 ## Collaboration Memory
 
 Collaboration Memory is read-only interpretation context during assessment.
@@ -108,7 +116,7 @@ architecture diagram.
 ## Google technologies and production stack
 
 - Google ADK
-- Gemini 3.5 Flash on Vertex AI
+- Gemini on Vertex AI
 - Google Cloud Run
 - Cloud Firestore
 - FastAPI
@@ -128,12 +136,11 @@ Copy `.env.example` to a private `.env`, configure a Google Cloud project, and
 authenticate with Google Application Default Credentials. Do not put API keys,
 tokens, service-account files, or proxy settings in the public repository.
 
-## Cloud Run deployment outline
+## Deployment
 
-Cloud Run uses an attached service account and the Vertex configuration in
-`.env.example`. Deployment should follow credential, Firestore, GitHub, and
-smoke-test verification. The outline is in [DEPLOYMENT.md](DEPLOYMENT.md);
-this repository-preparation step does not deploy.
+The public demo is deployed on Google Cloud Run. One FastAPI service serves both the frontend and API, while Cloud Firestore stores the trusted-state data used by the workflow.
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the deployment shape, runtime configuration names, and a safe redeployment outline.
 
 ## State integrity and evidence cursor
 
@@ -155,3 +162,7 @@ validity output, evidence normalization, Decision Gate authorization, atomic
 state transitions, idempotency, memory boundaries, API serving, UI structure,
 and Vertex configuration. External-environment tests are reported separately
 when credentials or network access are unavailable.
+
+## License
+
+MIT License. See [LICENSE](LICENSE).
